@@ -10,6 +10,7 @@ Database
 ### Overview
 The intent of this project is to explore archituctural approaches.
 Things that can be explored in this test are:
+
 1. The use of models defined by this gem in other modules/gems.
 2. The ability to interact directly with the database via sql
 3. The ability to use views
