@@ -1,39 +1,47 @@
 namespace :massive do
-  desc "This is a test rake task"
-  task :top do
+  require 'yaml'
+  desc "Lane DB Tools"
+
+  # tasks setup
+
+  db_config = Rails.application.config.database_configuration[Rails.env]
+
+  # This requires PGPORT, PGDATA, and PGDATABASE to be defined.
+  errors = Array.new
+  errors.push "Port is not defined" unless db_config['port']
+  errors.push "data_dir is not defined" unless db_config['data_dir']
+  errors.push "database is not defined" unless db_config['database']
+
+  if errors.length > 0
+    errors.each {|error| sh %(echo #{error}) }
+    exit 1
+  end
+
+
+  task :top => :environment do
     sh %(echo "Make Database!")
 
-    #This requires PGPORT, PGDATA, and PGDATABASE to be defined.
-    errors = Array.new
-    errors.push "ENV['PGPORT'] is not defined" unless ENV['PGPORT']
-    errors.push "ENV['PGDATA'] is not defined" unless ENV['PGDATA']
-    errors.push "ENV['PGDATABASE'] is not defined" unless ENV['PGDATABASE']
 
-    if errors.length > 0
-      errors.each {|error| sh %(echo #{error}) }
-      exit 1
-    end
-
-    sh %(echo #{ENV['PGPORT']})
+    sh %(echo #{db_config['port']})
     # exit
 
     #sh %(Database/database.bash)
 
-    cmd = "initdb --encoding=UTF8 --locale=C #{ENV['PGDATA']} > /dev/null 2>&1"
+    cmd = "initdb --encoding=UTF8 --locale=C #{db_config['data_dir']} > /dev/null 2>&1"
 
     # puts cmd
     # exit
 
     # sh %(initdb --encoding=UTF8 --locale=C #{ENV['PGDATA']} > /dev/null 2>&1)
-    sh %(initdb --encoding=UTF8 --locale=C #{ENV['PGDATA']})
+    sh %(initdb --encoding=UTF8 --locale=C #{db_config['data_dir']})
 
-    sh %(mv #{ENV['PGDATA']}/postgresql.conf #{ENV['PGDATA']}/postgresql.conf-original)
+    sh %(mv #{db_config['data_dir']}/postgresql.conf #{db_config['data_dir']}/postgresql.conf-original)
     sh %(sed -e 's/max_connections = 100/max_connections = 300/g' \
-            < #{ENV['PGDATA']}/postgresql.conf-original \
-            > #{ENV['PGDATA']}/postgresql.conf)
-    sh %(pg_ctl -D #{ENV['PGDATA']} -l #{ENV['PGDATA']}/logfile -o "-p #{ENV['PGPORT']}" -w start)
-    sh %(createdb -p #{ENV['PGPORT']} #{ENV['PGDATABASE']})
-    sh %(psql -c 'create extension plpythonu' #{ENV['PGDATABASE']})
+            < #{db_config['data_dir']}/postgresql.conf-original \
+            > #{db_config['data_dir']}/postgresql.conf)
+    sh %(pg_ctl -D #{db_config['data_dir']} -l #{db_config['data_dir']}/logfile -o "-p #{db_config['port']}" -w start)
+    sh %(createdb -p #{db_config['port']} #{db_config['database']})
+    sh %(psql -c 'create extension plpythonu' #{db_config['database']})
     # sh %(rm -rf .schema .db pgdata)
 
     sh %(set -e)
@@ -62,8 +70,8 @@ namespace :massive do
   task :clobber do
     sh %(echo "Bring the database down")
     # sh %(rm .schema .db)
-    sh %(pg_ctl -D #{ENV['PGDATA']}  -w stop)
-    sh %(rm -rf #{ENV['PGDATA']})
+    sh %(pg_ctl -D #{db_config['data_dir']}  -w stop)
+    sh %(rm -rf #{db_config['data_dir']})
     puts "exit status: " + $?.exitstatus.to_s
   end
 

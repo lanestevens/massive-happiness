@@ -8,6 +8,8 @@ development:
   password:
   host: localhost
   port: 55432
+  data_dir: pgdata
+
 
 test:
   adapter: postgresql
