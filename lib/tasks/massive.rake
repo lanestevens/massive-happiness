@@ -17,24 +17,10 @@ namespace :massive do
     exit 1
   end
 
-
   task :top => :environment do
     sh %(echo "Make Database!")
 
-
-    sh %(echo #{db_config['port']})
-    # exit
-
-    #sh %(Database/database.bash)
-
-    cmd = "initdb --encoding=UTF8 --locale=C #{db_config['data_dir']} > /dev/null 2>&1"
-
-    # puts cmd
-    # exit
-
-    # sh %(initdb --encoding=UTF8 --locale=C #{ENV['PGDATA']} > /dev/null 2>&1)
     sh %(initdb --encoding=UTF8 --locale=C #{db_config['data_dir']})
-
     sh %(mv #{db_config['data_dir']}/postgresql.conf #{db_config['data_dir']}/postgresql.conf-original)
     sh %(sed -e 's/max_connections = 100/max_connections = 300/g' \
             < #{db_config['data_dir']}/postgresql.conf-original \
@@ -63,7 +49,6 @@ namespace :massive do
 
     sh %(echo 'Adding default data...')
     sh %(psql --quiet --set ON_ERROR_STOP= -f Database/default_data.sql > /dev/null)
-
 
   end
 
