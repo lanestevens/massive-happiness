@@ -63,8 +63,8 @@ namespace :massive do
 
   task :clobber do
     sh %(echo "Bring the database down")
-    sh %(rm .schema .db)
-    sh %(pg_ctl -D #{ENV['PGDATA']} -m immediate -w stop)
+    # sh %(rm .schema .db)
+    sh %(pg_ctl -D #{ENV['PGDATA']}  -w stop)
     sh %(rm -rf #{ENV['PGDATA']})
     puts "exit status: " + $?.exitstatus.to_s
   end
