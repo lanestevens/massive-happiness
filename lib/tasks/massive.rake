@@ -36,8 +36,6 @@ namespace :massive do
     sh %(psql -c 'create extension plpythonu' #{ENV['PGDATABASE']})
     # sh %(rm -rf .schema .db pgdata)
 
-    puts "exit status: " + $?.exitstatus.to_s
-    exit
     sh %(set -e)
 
     sh %(echo 'Creating types...')
