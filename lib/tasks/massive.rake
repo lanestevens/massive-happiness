@@ -28,7 +28,6 @@ namespace :massive do
     sh %(pg_ctl -D #{db_config['data_dir']} -l #{db_config['data_dir']}/logfile -o "-p #{db_config['port']}" -w start)
     sh %(createdb -p #{db_config['port']} #{db_config['database']})
     sh %(psql -c 'create extension plpythonu' #{db_config['database']})
-    # sh %(rm -rf .schema .db pgdata)
 
     sh %(set -e)
 
@@ -50,9 +49,13 @@ namespace :massive do
     sh %(echo 'Adding default data...')
     sh %(psql --quiet --set ON_ERROR_STOP= -f Database/default_data.sql > /dev/null)
 
+    Rake::Task['db:schema:dump']
+    Rake::Task['db::seed']
+    Rake::Task['db:fixtures:load']
+
   end
 
-  task :clobber do
+  task :clobber => :environment do
     sh %(echo "Bring the database down")
     # sh %(rm .schema .db)
     sh %(pg_ctl -D #{db_config['data_dir']}  -w stop)

@@ -13,4 +13,17 @@
 
 ActiveRecord::Schema.define(version: 0) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+  enable_extension "plpythonu"
+
+  create_table "mood_readings", force: true do |t|
+    t.integer  "mood_type_id",                   null: false
+    t.datetime "created",      default: "now()", null: false
+  end
+
+  create_table "mood_types", force: true do |t|
+    t.string "type", limit: 24
+  end
+
 end
