@@ -51,3 +51,14 @@ make --directory Database
 # without the three environment variables set:
 PGPORT=55432 PGDATA=$(pwd)/pgdata PGDATABASE=happiness make --directory Database clobber
 ```
+
+# We can now use rake for that:
+
+```
+rake massive:up
+```
+to bring the database up, and
+```
+rake massive:down
+```
+to bring the db down.

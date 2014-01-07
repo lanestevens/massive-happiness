@@ -17,7 +17,7 @@ namespace :massive do
     exit 1
   end
 
-  task :top => :environment do
+  task :up => :environment do
     sh %(echo "Make Database!")
 
     sh %(initdb --encoding=UTF8 --locale=C #{db_config['data_dir']})
@@ -55,7 +55,9 @@ namespace :massive do
 
   end
 
-  task :clobber => :environment do
+
+
+  task :down => :environment do
     sh %(echo "Bring the database down")
     # sh %(rm .schema .db)
     sh %(pg_ctl -D #{db_config['data_dir']}  -w stop)
